@@ -7,12 +7,15 @@ public class Simulation : MonoBehaviour
 {
 
     Vector2 predictedPosition;
-
     float density;
+    Vector2 pressureForce;
+    Vector2 viscosityForce;
+
     float radius;
-    private Rigidbody2D rb;
-    Vector2 boundsSize = new Vector2(8f, 6f);
     float collisionDamping = 0.2f;
+    private Rigidbody2D rb;
+    // Size of the boundary
+    Vector2 boundsSize = new Vector2(8f, 6f);
 
     // Start is called before the first frame update
     void Start()
@@ -25,20 +28,6 @@ public class Simulation : MonoBehaviour
         setPosition(rb.position);
         setVelocity(new Vector2(0,0));
     }
-
-    // Update is called once per frame
-    // public void UpdatePhysics(Vector2 pressureAcceleration)
-    // {
-    //     Vector2 pressureVelocity = pressureAcceleration * Time.deltaTime;
-
-    //     rb.velocity += Vector2.down * gravity * Time.deltaTime + pressureVelocity;
-    //     rb.position += rb.velocity * Time.deltaTime;
-
-    //     velocity = rb.velocity;
-    //     position = rb.position;
-
-    //     ResolveCollisions();
-    // }
 
 
     public void ResolveCollisions()
@@ -54,39 +43,23 @@ public class Simulation : MonoBehaviour
         Vector2 newPosition = rb.position;
         Vector2 newVelocity = rb.velocity;
 
-        // If bigger than right bound, make vel negative 
-        if(newPosition.x > halfBoundsSize.x) {
+        // If bigger than right/left bound, reverse velocity and place particle at bound
+        if(math.abs(newPosition.x) > halfBoundsSize.x) {
 
             newPosition.x = halfBoundsSize.x * math.sign(newPosition.x);
-            newVelocity.x = -1 * collisionDamping * math.abs(newVelocity.x);
+            newVelocity.x *= -1 * collisionDamping;
 
+            //Save new values to the particle
             rb.position = newPosition;
             rb.velocity = newVelocity;
         }
-        // If smaller than left bound, make vel positive 
-        if(newPosition.x < -halfBoundsSize.x) {
-
-            newPosition.x = halfBoundsSize.x * math.sign(newPosition.x);
-            newVelocity.x = collisionDamping * math.abs(newVelocity.x);
-
-            rb.position = newPosition;
-            rb.velocity = newVelocity;
-        }
-        // If bigger than top bound, make vel negative 
-        if(newPosition.y > halfBoundsSize.y) {
+        // If bigger than top/bottom bound, reverse velocity and place particle at bound
+        if(math.abs(newPosition.y) > halfBoundsSize.y) {
 
             newPosition.y = halfBoundsSize.y * math.sign(newPosition.y);
-            newVelocity.y = -1 * collisionDamping * math.abs(newVelocity.y);
+            newVelocity.y *= -1 * collisionDamping;
 
-            rb.position = newPosition;
-            rb.velocity = newVelocity;
-        }
-        // If smaller than bottom bound, make vel positive 
-        if(newPosition.y < -halfBoundsSize.y) {
-
-            newPosition.y = halfBoundsSize.y * math.sign(newPosition.y);
-            newVelocity.y = collisionDamping * math.abs(newVelocity.y);
-
+            //Save new values to the particle
             rb.position = newPosition;
             rb.velocity = newVelocity;
         }
@@ -95,6 +68,7 @@ public class Simulation : MonoBehaviour
 
     public void ResolveObjectCollisions()
     {
+        //Get info on the size and position of the cube
         GameObject cube = GameObject.FindGameObjectWithTag("CollisionObject");
         Vector3 cubeSize = cube.GetComponent<Renderer>().bounds.size;
         Vector3 cubeVelocity = cube.GetComponent<Rigidbody>().velocity;
@@ -102,40 +76,46 @@ public class Simulation : MonoBehaviour
         Vector2 halfCubeSize = cubeSize / 2;
         Vector3 cubePosition = cube.transform.position;
 
+        // Get the particles current position and velocity
         Vector2 newPosition = rb.position;
         Vector2 newVelocity = rb.velocity;
 
+        // Check the distance from particle to outer edges of cube
         float diffToLeft = newPosition.x + radius - (cubePosition.x - halfCubeSize.x);
         float diffToRight = - newPosition.x + radius + (cubePosition.x + halfCubeSize.x);
         float diffToBottom = newPosition.y + radius - (cubePosition.y - halfCubeSize.y);
         float diffToTop = - newPosition.y + radius + (cubePosition.y + halfCubeSize.y);
 
+        // If all distances are positive then the particle is within the cube
         bool withinCube = (diffToLeft >= 0) && (diffToRight >= 0) && (diffToBottom >= 0) && (diffToTop >= 0);
 
         if(withinCube)
         {
+            // If left if the smallest distance, push out the particle to the left
             if (diffToLeft < diffToRight && diffToLeft < diffToTop && diffToLeft < diffToBottom)
             {
                 newPosition.x = (cubePosition.x - halfCubeSize.x) - radius;
             } 
+            // If right if the smallest distance, push out the particle to the right
             else if (diffToRight < diffToLeft && diffToRight < diffToTop && diffToRight < diffToBottom)
             {
                 newPosition.x = (cubePosition.x + halfCubeSize.x) + radius;
             }
+            // If bottom if the smallest distance, push out the particle to the bottom
             else if (diffToBottom < diffToTop && diffToBottom < diffToRight && diffToBottom < diffToLeft)
             {
                 newPosition.y = (cubePosition.y - halfCubeSize.y) - radius;
             }
+            // If top if the smallest distance, push out the particle to the top
             else 
             {
                 newPosition.y = (cubePosition.y + halfCubeSize.y) + radius;
             }
+            // Change to velocity to the opposite direction
             newVelocity.x *= -1 * collisionDamping;
             newVelocity.y *= -1 * collisionDamping;
 
-            //newVelocity.x += cubeVelocity.x;
-            //newVelocity.y += cubeVelocity.y;
-
+            // Update the particle velocity
             rb.position = newPosition;
             rb.velocity = newVelocity;
         }
@@ -153,16 +133,6 @@ public class Simulation : MonoBehaviour
         rb.position = newPosition;
     }
 
-    public Vector2 getPredictedPosition()
-    {
-        return predictedPosition;
-    }
-    public void setPredictedPosition(Vector2 newPosition)
-    {
-        predictedPosition = newPosition;
-    }
-    
-
     public Vector2 getVelocity()
     {
         return rb.velocity;
@@ -172,6 +142,14 @@ public class Simulation : MonoBehaviour
         rb.velocity = newVelocity;
     }
 
+    public Vector2 getPredictedPosition()
+    {
+        return predictedPosition;
+    }
+    public void setPredictedPosition(Vector2 newPosition)
+    {
+        predictedPosition = newPosition;
+    }
 
     public float getDensity()
     {
@@ -182,4 +160,21 @@ public class Simulation : MonoBehaviour
         density = newDensity;
     }
 
+    public Vector2 getPressureForce()
+    {
+        return pressureForce;
+    }
+    public void setPressureForce(Vector2 newPressureForce)
+    {
+        pressureForce = newPressureForce;
+    }
+
+    public Vector2 getViscosityForce()
+    {
+        return viscosityForce;
+    }
+    public void setViscosityForce(Vector2 newViscosityForce)
+    {
+        viscosityForce = newViscosityForce;
+    }
 }

@@ -17,9 +17,9 @@ public class ParticleManager : MonoBehaviour
 
     public float targetDensity = 2.75f;
     public float smoothingRadius = 0.5f;
-    public float pressureMultiplier = 0.1f;
-    public float viscosityStrength = 0f;
-
+    public float pressureMultiplier = 0.5f;
+    public float viscosityStrength = 0.2f;
+    // Mouse interactions
     public float interactionStrength = 0f;
     public float interactionRadius = 3f;
 
@@ -45,16 +45,17 @@ public class ParticleManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // Effect of gravity on velocity
+        //Vector2 velocity = objects[i].getVelocity();
+        //velocity *= 0.9f;   // ta bort inertia lite
+        //velocity += Vector2.down * gravity * Time.deltaTime;
+
+        // Density calculation from predicted position
         for(int i = 0 ; i < numParticles; i++) 
         {
-            // Effect of gravity on velocity
-            Vector2 velocity = objects[i].getVelocity();
-            velocity *= 0.9f;   // ta bort inertia lite
-            velocity += Vector2.down * gravity * Time.deltaTime;
-            //objects[i].setVelocity(velocity);
-
             // Predict position to use in density calculation
             Vector2 position = objects[i].getPosition();
+            Vector2 velocity = objects[i].getVelocity();
             Vector2 predictedPosition = position + velocity * Time.deltaTime;
             objects[i].setPredictedPosition(predictedPosition);
 
@@ -62,27 +63,40 @@ public class ParticleManager : MonoBehaviour
             float density = CalculateDensity(predictedPosition);
             //Debug.Log("Density: "+ density + "for particle: "+ i);
             objects[i].setDensity(density);
-
-
-            // InteractionForce(mouse.pos, interactionRadius, interactionStrength, i);
-
-            // update velocity again according to pressure force 
-            Vector2 pressureForce = CalculatePressureForce(i);
-            Vector2 pressureAcceleration = pressureForce / objects[i].getDensity();
-
+        }
+        // Add viscosity force and update velocity
+        for(int i = 0 ; i < numParticles; i++) 
+        {
             Vector2 viscosityForce = CalculateViscosityForce(i);
             Vector2 viscosityAcceleration = viscosityForce / objects[i].getDensity();
 
-            velocity += pressureAcceleration * Time.deltaTime;
+            Vector2 velocity = objects[i].getVelocity();
+            velocity += viscosityAcceleration * Time.deltaTime;
             objects[i].setVelocity(velocity);
 
+        }
+        // Add pressure force
+        for(int i = 0 ; i < numParticles; i++) 
+        {
+            Vector2 pressureForce = CalculatePressureForce(i);
+            objects[i].setPressureForce(pressureForce);
+        }
+        // Update velocity and position and handle collisions
+        for(int i = 0 ; i < numParticles; i++) 
+        {
+            // InteractionForce(mouse.pos, interactionRadius, interactionStrength, i);
 
-            // update position
+            Vector2 pressureAcceleration = objects[i].getPressureForce() / objects[i].getDensity();
+
+            Vector2 velocity = objects[i].getVelocity();
+            Vector2 position = objects[i].getPosition();
+
+            velocity += pressureAcceleration * Time.deltaTime;
             position += velocity * Time.deltaTime;
             objects[i].setPosition(position);
+            objects[i].setVelocity(velocity);
 
             objects[i].ResolveCollisions();
-
         }
         
     }
@@ -96,15 +110,11 @@ public class ParticleManager : MonoBehaviour
         {
             Vector2 position = obj.getPosition();
             float dist = (position - particlePosition).magnitude;
-            float influence = SmoothingArea(dist, smoothingRadius);
+            float influence = SmoothingKernel(dist, smoothingRadius);
             density += mass * influence;
         }
         return density;
     }
-
-
-
-
 
     Vector2 CalculatePressureForce(int particleIndex)
     {
@@ -112,30 +122,22 @@ public class ParticleManager : MonoBehaviour
 
         for(int otherParticleIndex = 0; otherParticleIndex < numParticles; otherParticleIndex++)
         {
+            //Hoppas över partikeln vi räknar på
             if(particleIndex == otherParticleIndex) continue;
 
             Vector2 offset = objects[otherParticleIndex].getPosition() - objects[particleIndex].getPosition();
             float dist = offset.magnitude;
+            // Se till att inte dela på 0
             Vector2 dir = (dist <= 0) ? getRandomDir() : (offset / dist);
 
-            float slope = SmoothingAreaDerivative(dist, smoothingRadius);
+            float slope = SmoothingKernelDerivative(dist, smoothingRadius);
             float otherDensity = objects[otherParticleIndex].getDensity();
-            if(otherDensity == 0) 
-            {
-                otherDensity = CalculateDensity(objects[otherParticleIndex].getPosition());
-            }
             float density = objects[particleIndex].getDensity();
-            if(density == 0) 
-            {
-                density = CalculateDensity(objects[particleIndex].getPosition());
-            }
             float sharedPressure = CalculateSharedPressure(otherDensity, density);
 
             // Puttar bort partikeln från andra partiklar
             pressureForce += -sharedPressure * dir * slope * mass / otherDensity;
         }
-
-        //Debug.Log("pressureForce: "+ pressureForce);
 
         return pressureForce;
     }
@@ -148,7 +150,7 @@ public class ParticleManager : MonoBehaviour
         for(int otherParticleIndex = 0; otherParticleIndex < numParticles; otherParticleIndex++)
         {
             float dst = (position - objects[otherParticleIndex].getPosition()).magnitude;
-            float influence = ViscositySmoothingArea(dst, smoothingRadius);
+            float influence = ViscositySmoothingKernel(dst, smoothingRadius);
             viscostityForce += (objects[otherParticleIndex].getVelocity() - objects[particleIndex].getVelocity()) * influence;
         }
         return viscostityForce * viscosityStrength;
@@ -172,7 +174,7 @@ public class ParticleManager : MonoBehaviour
     }
 
     // hur mycket en partikel påverkar en annan beroende på deras avstånd
-    static float SmoothingArea(float dist, float radius) 
+    static float SmoothingKernel(float dist, float radius) 
     {
         if(dist >= radius) return 0;
 
@@ -181,7 +183,7 @@ public class ParticleManager : MonoBehaviour
         return value * value / volume;
     }
 
-    static float SmoothingAreaDerivative(float dist, float radius) 
+    static float SmoothingKernelDerivative(float dist, float radius) 
     {
         if(dist >= radius) return 0;
 
@@ -192,7 +194,7 @@ public class ParticleManager : MonoBehaviour
 
 
     // hur mycket en partikel påverkar en annan beroende på deras avstånd (specifikt för viscosity)
-    static float ViscositySmoothingArea(float dist, float radius) 
+    static float ViscositySmoothingKernel(float dist, float radius) 
     {
         if(dist >= radius) return 0;
 
@@ -200,8 +202,6 @@ public class ParticleManager : MonoBehaviour
         float value = radius * radius - dist * dist;
         return value * value / volume;
     }
-
-
 
     // Fitting for gasses
     float ConvertDensityToPressure(float density)
@@ -217,23 +217,23 @@ public class ParticleManager : MonoBehaviour
 
 
 
-    // Mus
-    Vector2 InteractionForce(Vector2 inputPos, float radius, float strength, int particleIndex)
-    {
-        Vector2 InteractionForce = Vector2.zero;
-        Vector2 offset = inputPos - objects[particleIndex].getPosition();
-        float sqrDst = Vector2.Dot(offset, offset);
+    // Mouse interaction
+    // Vector2 InteractionForce(Vector2 inputPos, float radius, float strength, int particleIndex)
+    // {
+    //     Vector2 InteractionForce = Vector2.zero;
+    //     Vector2 offset = inputPos - objects[particleIndex].getPosition();
+    //     float sqrDst = Vector2.Dot(offset, offset);
 
-        if(sqrDst < radius * radius)
-        {
-            float dst = math.sqrt(sqrDst);
-            Vector2 dirToInputPoint = dst <= float.Epsilon ? Vector2.zero : offset/dst;
-            float centreT = 1 - dst / radius;
+    //     if(sqrDst < radius * radius)
+    //     {
+    //         float dst = math.sqrt(sqrDst);
+    //         Vector2 dirToInputPoint = dst <= float.Epsilon ? Vector2.zero : offset/dst;
+    //         float centreT = 1 - dst / radius;
 
-            InteractionForce += (dirToInputPoint * strength - objects[particleIndex].getVelocity()) * centreT;
-        }
+    //         InteractionForce += (dirToInputPoint * strength - objects[particleIndex].getVelocity()) * centreT;
+    //     }
 
-        return InteractionForce;
-    }
+    //     return InteractionForce;
+    // }
 
 }
