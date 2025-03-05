@@ -359,6 +359,7 @@
 "Assets/Scripts/MovableObject.cs"
 "Assets/Scripts/ParticleManager.cs"
 "Assets/Scripts/Simulation.cs"
+"Assets/Scripts/Solid.cs"
 -langversion:9.0
 /deterministic
 /optimize+

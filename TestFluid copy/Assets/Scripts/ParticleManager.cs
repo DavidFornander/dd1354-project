@@ -6,12 +6,18 @@ using Unity.Mathematics;
 
 public class ParticleManager : MonoBehaviour
 {
-    public GameObject objectPrefab; // Reference to object prefab
+    public GameObject simPrefab; // Reference to object prefab
+    public GameObject solidPrefab; // Reference to object prefab
     private Simulation[] objects;
+    private Solid[] objects2;
 
+    public float xBound = 8f;
+    public float yBound = 6f;
     public int numParticles;
+    private int numSolid = 94;
     public float particleSpacing = 0.25f;
-    float radius = 0.5f;
+    //float radius = 0.5f;
+    private float radiusSolid = 0.15f;
     const float mass = 1;
     public float gravity = 0f;
 
@@ -26,20 +32,8 @@ public class ParticleManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // Skapa objekten och placera ut dem i ett grid i början av simuleringen
-        objects = new Simulation[numParticles];
-
-        int particlesPerRow = (int) math.sqrt(numParticles);
-        int particlesPerCol = (numParticles - 1) / particlesPerRow + 1;
-
-        for(int i = 0; i < numParticles; i++) 
-        {
-            float x = ((i % (float)particlesPerRow) - ((float)particlesPerRow / 2f)) * radius;
-            float y = ((i / (float)particlesPerRow) - ((float)particlesPerCol / 2f)) * radius;
-
-            GameObject clone = Instantiate(objectPrefab, new Vector2(x, y), Quaternion.identity);
-            objects[i] = clone.GetComponent<Simulation>(); // Store reference
-        }
+        FluidParticlesInit();
+        SolidParticlesInit();
     }
 
     // Update is called once per frame
@@ -102,6 +96,62 @@ public class ParticleManager : MonoBehaviour
     }
 
 
+    void FluidParticlesInit()
+    {
+        // Skapa objekten och placera ut dem i ett grid i början av simuleringen
+        objects = new Simulation[numParticles];
+
+        int particlesPerRow = (int) math.sqrt(numParticles);
+        int particlesPerCol = (numParticles - 1) / particlesPerRow + 1;
+
+        for(int i = 0; i < numParticles; i++) 
+        {
+            float x = ((i % (float)particlesPerRow) - ((float)particlesPerRow / 2f)) * 0.3f;
+            float y = ((i / (float)particlesPerRow) - ((float)particlesPerCol / 2f)) * 0.3f;
+
+            GameObject clone = Instantiate(simPrefab, new Vector2(x, y), Quaternion.identity);
+            objects[i] = clone.GetComponent<Simulation>(); // Store reference
+            objects[i].setBounds(xBound, yBound);
+        }
+    }
+
+    void SolidParticlesInit()
+    {
+        // Skapa partiklarna till väggarna 
+        objects2 = new Solid[numSolid];
+
+        for(int i = 0; i < numSolid; i++)
+        {
+            // Placera ut partiklarna 
+            float x = -10;
+            float y = -10;
+            if (i <= xBound/(radiusSolid*2))
+            {
+                x = -xBound/2 + radiusSolid * 2 * i;
+                y = yBound/2 + radiusSolid;
+            }
+            else if (i <= 2 * xBound/(radiusSolid*2))
+            {
+                x = -3*xBound/2 + radiusSolid * 2 * i;
+                y = -yBound/2 - radiusSolid;
+            }
+            else if (i <= 2 * xBound/(radiusSolid*2) + yBound/(radiusSolid*2))
+            {
+                x = -xBound/2 - radiusSolid;
+                y = yBound/2 + radiusSolid * 2 * (i-(2 * xBound/(radiusSolid*2) + yBound/(radiusSolid*2)));
+            }
+            else 
+            {
+                x = xBound/2 + radiusSolid;
+                y = -yBound/2 + radiusSolid * 2 * (i-(2 * xBound/(radiusSolid*2) + yBound/(radiusSolid*2)));
+            }
+            GameObject clone2 = Instantiate(solidPrefab, new Vector2(x, y), Quaternion.identity);
+            objects2[i] = clone2.GetComponent<Solid>(); // Store reference
+            objects2[i].setDensity(targetDensity);  // Density behövs för att kunna räkna ut pressure
+        }
+
+    }
+
 
     float CalculateDensity(Vector2 particlePosition) {
         float density = 0;
@@ -111,6 +161,14 @@ public class ParticleManager : MonoBehaviour
             Vector2 position = obj.getPosition();
             float dist = (position - particlePosition).magnitude;
             float influence = SmoothingKernel(dist, smoothingRadius);
+            density += mass * influence;
+        }
+        //Loopa igenom alla solid partiklar också så att luften påverkas av solid partiklarna
+        foreach (Solid obj in objects2)
+        {
+            Vector2 position = obj.getPosition();
+            float dist = (position - particlePosition).magnitude;
+            float influence = SmoothingKernel(dist, smoothingRadius); //TODO: ändra detta till en specifikt för solid partiklar
             density += mass * influence;
         }
         return density;
@@ -132,6 +190,22 @@ public class ParticleManager : MonoBehaviour
 
             float slope = SmoothingKernelDerivative(dist, smoothingRadius);
             float otherDensity = objects[otherParticleIndex].getDensity();
+            float density = objects[particleIndex].getDensity();
+            float sharedPressure = CalculateSharedPressure(otherDensity, density);
+
+            // Puttar bort partikeln från andra partiklar
+            pressureForce += -sharedPressure * dir * slope * mass / otherDensity;
+        }
+
+        for(int i = 0; i < numSolid; i++)
+        {
+            Vector2 offset = objects2[i].getPosition() - objects[particleIndex].getPosition();
+            float dist = offset.magnitude;
+            // Se till att inte dela på 0
+            Vector2 dir = (dist <= 0) ? getRandomDir() : (offset / dist);
+
+            float slope = SmoothingKernelDerivative(dist, smoothingRadius);
+            float otherDensity = objects2[i].getDensity();
             float density = objects[particleIndex].getDensity();
             float sharedPressure = CalculateSharedPressure(otherDensity, density);
 

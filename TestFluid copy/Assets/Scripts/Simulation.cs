@@ -15,7 +15,7 @@ public class Simulation : MonoBehaviour
     float collisionDamping = 0.2f;
     private Rigidbody2D rb;
     // Size of the boundary
-    Vector2 boundsSize = new Vector2(8f, 6f);
+    Vector2 boundsSize;
 
     // Start is called before the first frame update
     void Start()
@@ -25,7 +25,7 @@ public class Simulation : MonoBehaviour
 
         rb = GetComponent<Rigidbody2D>(); // Get the Rigidbody component
 
-        setPosition(rb.position);
+        //setPosition(rb.position);
         setVelocity(new Vector2(0,0));
     }
 
@@ -120,6 +120,11 @@ public class Simulation : MonoBehaviour
             rb.velocity = newVelocity;
         }
 
+    }
+
+    public void setBounds(float x, float y)
+    {
+        boundsSize = new Vector2(x, y);
     }
 
 
