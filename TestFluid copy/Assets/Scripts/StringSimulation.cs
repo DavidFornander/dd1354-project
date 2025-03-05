@@ -6,7 +6,7 @@ public class StringSimulation : MonoBehaviour
 {
     [Header("String Physics")]
     public float stringLength = 5.0f;
-    public float tension = 100.0f;      // T - String tension - 100
+    public float tension = 10.0f;      // T - String tension - 100
     public float linearDensity = 0.01f; // μ - Mass per unit length - 0.01f
     public float youngsModulus = 2e9f;  // E - Young's modulus for stiffness - 2e9f
     public float stringRadius = 0.005f; // For calculating moment of inertia - 0.005f

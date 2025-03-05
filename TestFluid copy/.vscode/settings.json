@@ -51,5 +51,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "TestFluid.sln"
+    "dotnet.defaultSolution": "TestFluid copy.sln"
 }
