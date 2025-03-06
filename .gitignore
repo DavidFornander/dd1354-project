@@ -72,3 +72,24 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# Ignore TestFluid library files
+TestFluid/Library/
+
+# Ignore TestFluid temp files
+TestFluid/Temp/
+
+# Ignore vscode settings
+.vscode/
+
+# Ignore obj files
+TestFluid/obj/
+
+# Ignore build files
+TestFluid/build/
+
+# Ignore Logs
+TestFluid/Logs/
+
+# Ignore user settings 
+TestFluid/UserSettings/
