@@ -33,7 +33,13 @@ public class Simulation : MonoBehaviour
     public void ResolveCollisions()
     {
         ResolveBoundCollisions();
-        ResolveObjectCollisions();
+
+        GameObject[] cubes = GameObject.FindGameObjectsWithTag("CollisionObject");
+        foreach(GameObject cube in cubes)
+        {
+            ResolveObjectCollisions(cube);
+        }
+
     }
 
 
@@ -66,10 +72,9 @@ public class Simulation : MonoBehaviour
 
     }
 
-    public void ResolveObjectCollisions()
+    public void ResolveObjectCollisions(GameObject cube)
     {
         //Get info on the size and position of the cube
-        GameObject cube = GameObject.FindGameObjectWithTag("CollisionObject");
         Vector3 cubeSize = cube.GetComponent<Renderer>().bounds.size;
         Vector3 cubeVelocity = cube.GetComponent<Rigidbody>().velocity;
 
