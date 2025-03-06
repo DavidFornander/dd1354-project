@@ -33,11 +33,13 @@ public class Simulation : MonoBehaviour
     public void ResolveCollisions()
     {
         ResolveBoundCollisions();
+
         GameObject[] cubes = GameObject.FindGameObjectsWithTag("CollisionObject");
         foreach(GameObject cube in cubes)
         {
             ResolveObjectCollisions(cube);
         }
+
     }
 
 
