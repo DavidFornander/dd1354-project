@@ -113,6 +113,10 @@
                 We will start working on the string, find a way to make the string particles collide with the fluid and
                 improve the current fluid.
             </p>
+            <h4>References</h4>
+            <ul>
+                <li>Sebastian Lague, "Coding Adventure: Simulating Fluids" [<a href="https://www.youtube.com/watch?v=rSKMYc1CQHE">Video link</a>]</li>
+            </ul>
         </article>
 
         <!-- Article 2 -->
@@ -178,47 +182,66 @@
 
         <!-- Article 3 -->
         <article>
-            <h3>Update 3 - [Placeholder Title]</h3>
-            <h6>[Placeholder Date]</h6>
+            <h3>Update 3 - Updating the fluid</h3>
+            <h6>2025-03-05</h6>
             <p>
-                [Placeholder welcoming text and overview of improvements.]
+                Since the last post on the fluid some changes have been made in accordance with the literature on the topic. We have added a visocosity force and better boundaries around the fluid. 
+                <br><br>
+                The smoothing kernels have not been explained so far so below is a picture of our current choice, the pressure kernel is in red and the viscosity kernel is in black. 
             </p>
+            <figure class="center bordered">
+                <img src="public/smoothKernel.png" alt="[Placeholder alt text]">
+            </figure>
 
             <p>
-                [Placeholder explanation of a technical mistake and the corrected procedure.]
+                In our weakly compressible fluid the translation between density and pressure is done through this function <code>k<sub>p</sub>(ρ - ρ<sub>0</sub>)</code> 
+                where <code>k<sub>p</sub></code> is the pressure multiplier, <code>ρ</code> is the particle's density, and <code>ρ<sub>0</sub></code> is the target density of the fluid.
+            </p>
+            <p>
+                The fluid particles are now updated according to the code below. 
             </p>
 
             <code style="white-space: pre-wrap;">
-// [Placeholder code showing correct update sequence]
+// Update sequence called each frame
 for (int i = 0; i < n; i++) {
-    // Perform calculation
-    // Store new state
+    // Predict position from current velocity
+    // Calculate the density at the predicted position
 }
 for (int i = 0; i < n; i++) {
-    // Update state
+    // Calculate viscosity force
+    // Get viscosity acceleration
+    // Update particle velocity
+}
+for (int i = 0; i < n; i++) {
+    // Calculate pressure force
+}
+for (int i = 0; i < n; i++) {
+    // Get pressure acceleration 
+    // Update particle velocity
+    // Check that each particle is within the bounds
 }
             </code>
 
             <p>
-                [Placeholder explanation regarding the previous mistake.]
+                In the video below the brown particles are used as a boundary, they each influence the pressure force on each of the fluid particles. 
+                Once the fluid has viscosity the waves that form are more visible compared to the previous fluid video. 
             </p>
-
             <figure class="center bordered">
-                <iframe width="80%" height="400" src="https://www.youtube.com/embed/placeholder"
+                <iframe width="80%" height="200" src="public/Screen_Recording_2025-03-05.mp4" type="video/mp4"
                     title="Placeholder video" frameborder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowfullscreen></iframe>
             </figure>
 
-            <figure class="center bordered">
-                <iframe width="80%" height="400" src="https://www.youtube.com/embed/placeholder"
-                    title="Placeholder video" frameborder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowfullscreen></iframe>
-            </figure>
-
+            <h4>References</h4>
             <p>
-                [Placeholder reflections and analysis on the simulation performance.]
+                <ul>
+                    <li>Dan Koschier et al., "Smoothed Particle Hydrodynamics" [<a href="https://sph-tutorial.physics-simulation.org/pdf/SPH_Tutorial.pdf">Link</a>]</li>
+                    <li>Matthias Müller et al., "Particle-Based Fluid Simulation for Interactive Applications" [<a href="https://matthias-research.github.io/pages/publications/sca03.pdf">Link</a>]</li>
+                    <li>M. B. Liu & G. R. Liu "Smoothed Particle Hydrodynamics (SPH): an Overview and Recent Developments" [<a href="https://link.springer.com/article/10.1007/s11831-010-9040-7">Link</a>]</li>
+                    <li>Xiaokun Wang et al., "Physics-based fluid simulation in computer graphics: Survey,
+                        research trends, and challenges" [<a href="https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=10885003">Link</a>]</li>
+                </ul>
             </p>
         </article>
 
