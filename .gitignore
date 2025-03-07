@@ -93,3 +93,6 @@ TestFluid/Logs/
 
 # Ignore user settings 
 TestFluid/UserSettings/
+
+# .ds_store files
+.DS_Store
