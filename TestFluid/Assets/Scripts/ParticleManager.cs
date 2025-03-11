@@ -14,7 +14,7 @@ public class ParticleManager : MonoBehaviour
     public float xBound = 8f;
     public float yBound = 6f;
     public int numParticles;
-    private int numSolid = 94;
+    public int numSolid = 94;
     public float particleSpacing = 0.25f;
     //float radius = 0.5f;
     private float radiusSolid = 0.15f;
@@ -285,11 +285,34 @@ public class ParticleManager : MonoBehaviour
         return pressure;
     }
 
+    // Method to get number of particles
+    public int GetParticleCount()
+    {
+        return numParticles;
+    }
 
+    // Method to get a particle position
+    public Vector2 GetParticlePosition(int index)
+    {
+        if (index >= 0 && index < numParticles)
+            return objects[index].getPosition();
+        return Vector2.zero;
+    }
 
-
-
-
+    // Method to apply external force to a specific particle
+    public void ApplyExternalForceToParticle(int index, Vector2 force)
+    {
+        if (index >= 0 && index < numParticles)
+        {
+            // Convert force to acceleration 
+            Vector2 acceleration = force / objects[index].getDensity();
+            
+            // Apply acceleration to velocity
+            Vector2 velocity = objects[index].getVelocity();
+            velocity += acceleration * Time.deltaTime;
+            objects[index].setVelocity(velocity);
+        }
+    }
 
     // Mouse interaction
     // Vector2 InteractionForce(Vector2 inputPos, float radius, float strength, int particleIndex)

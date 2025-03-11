@@ -366,4 +366,15 @@ public class StringSimulation : MonoBehaviour
             positions[index] += Vector3.up * amplitude;
         }
     }
+
+    // Methods to expose string data to other components
+    public List<Vector3> GetStringPositions()
+    {
+        return positions;
+    }
+
+    public List<Vector3> GetStringVelocities()
+    {
+        return velocities;
+    }
 }
