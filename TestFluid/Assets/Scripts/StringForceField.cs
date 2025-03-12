@@ -53,11 +53,12 @@ public class StringForceField : MonoBehaviour
                 // Apply force only if within influence radius
                 if (distance < influenceRadius)
                 {
+                    Vector2 direction = (particlePos - stringPos).normalized;
                     // Force decreases with distance (linear falloff)
-                    float forceFactor = 1.0f - (distance / influenceRadius);
+                    float influence = particleManager.SmoothingKernel(distance, influenceRadius);
                     
                     // Force direction is in the direction of string velocity
-                    Vector2 force = stringVel * forceFactor * forceMultiplier;
+                    Vector2 force = direction * stringVel.magnitude * influence * forceMultiplier;
                     totalForce += force;
                 }
             }

@@ -153,18 +153,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   simPrefab: {fileID: 1443585858681224256, guid: 8a0e40baa1f33489e97e6ff7cd8d87da, type: 3}
   solidPrefab: {fileID: 5227252978887891755, guid: 9cf2c0dd2d1a74097976abf46574cef4, type: 3}
-  xBound: 20
-  yBound: 20
-  numParticles: 40
-  numSolid: 270
-  particleSpacing: 0.05
+  xBound: 4
+  yBound: 10
+  numParticles: 150
+  numSolid: 60
+  solidSpacingRadius: 0.3
+  radiusSolid: 0.75
   gravity: 0
-  targetDensity: 2.75
+  targetDensity: 0.39
   smoothingRadius: 1
   pressureMultiplier: 5.02
   viscosityStrength: 0.3
-  interactionStrength: 0
-  interactionRadius: 6
 --- !u!4 &166518621
 Transform:
   m_ObjectHideFlags: 0
@@ -339,6 +338,7 @@ GameObject:
   - component: {fileID: 290748385}
   - component: {fileID: 290748384}
   - component: {fileID: 290748383}
+  - component: {fileID: 290748388}
   m_Layer: 0
   m_Name: LeftAnchor (1)
   m_TagString: CollisionObject
@@ -453,12 +453,24 @@ Transform:
   m_GameObject: {fileID: 290748382}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -20, y: -3, z: 0}
+  m_LocalPosition: {x: -4, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &290748388
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 290748382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f40780a088d546b497b259b5b2bfb08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &585586744
 GameObject:
   m_ObjectHideFlags: 0
@@ -599,7 +611,7 @@ Transform:
   m_GameObject: {fileID: 585586744}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 20, y: -3, z: 0}
+  m_LocalPosition: {x: 4, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -887,7 +899,7 @@ MonoBehaviour:
   rightAnchor: {fileID: 585586750}
   gravity: 0
   stringWidth: 0.1
-  stringMaterial: {fileID: 2100000, guid: fb1faa05020a24974a227235b5e01bbc, type: 2}
+  stringMaterial: {fileID: 0}
   stringColor: {r: 0.8, g: 0.7, b: 0.2, a: 1}
   enableInteraction: 1
   interactionRadius: 5
@@ -922,7 +934,7 @@ MonoBehaviour:
   stringSimulation: {fileID: 1411653149}
   particleManager: {fileID: 166518620}
   influenceRadius: 1
-  forceMultiplier: 7
+  forceMultiplier: 2
   velocityThreshold: 0.1
   visualizeForces: 0
 --- !u!1 &1642520564
@@ -1158,7 +1170,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0.1}
-  m_LocalScale: {x: 40, y: 40, z: 0.01}
+  m_LocalScale: {x: 4, y: 10, z: 0.01}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -1249,7 +1261,7 @@ Transform:
   m_GameObject: {fileID: 1960829212}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -40}
+  m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1297,7 +1309,7 @@ MonoBehaviour:
   rightAnchor: {fileID: 1257862747}
   gravity: 0
   stringWidth: 0.1
-  stringMaterial: {fileID: 2100000, guid: fb1faa05020a24974a227235b5e01bbc, type: 2}
+  stringMaterial: {fileID: 0}
   stringColor: {r: 0.8, g: 0.7, b: 0.2, a: 1}
   enableInteraction: 1
   interactionRadius: 1

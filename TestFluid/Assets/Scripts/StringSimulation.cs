@@ -377,4 +377,8 @@ public class StringSimulation : MonoBehaviour
     {
         return velocities;
     }
+    public bool GetIsDragging()
+    {
+        return isDragging;
+    }
 }
