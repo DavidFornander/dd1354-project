@@ -247,51 +247,61 @@ for (int i = 0; i < n; i++) {
 
         <!-- Article 4 -->
         <article>
-            <h3>Update 4 - [Placeholder Title]</h3>
-            <h6>[Placeholder Date]</h6>
-
-            <blockquote>
-                [Placeholder blockquote text]
-                <footer>
-                    <cite>[Placeholder citation]</cite>
-                </footer>
-            </blockquote>
+            <h3>Update 4 - Finalizing our simulation</h3>
+            <h6>2025-03-17</h6>
 
             <p>
-                [Placeholder final update introduction for a concluding demonstration.]
+            We have now submitted our final project. 
+            </p>
+            <p>
+            During our last two weeks, we focused on trying to integrate the string with the fluid-based particle system.
             </p>
 
+        
+
+         
+
+            <p>
+                This is where we ran into our biggest issues of this project. Turns out, handling collisions between the string and fluid particles in a way that wasn't too slow for the simulation to work was a real challange. Who would have guessed. 😅 </p>
+                <p>
+                    At the start, we tried this naive method where every particle had to check how far it was from every other particle in the simulation. When trying to piece the simulations together, we realised, that was a bit… ugh, too costly, and it made the simulation very unstable. Sometimes the string would start vibrating uncontrollably and break. Sometimes the simulation was not able to handle the collisions fast enough, so that the string would just go through many of the particles. Which you can still see some remnants of in the video below.
+            </p>
+
+            <p>
+                So, to solve this and make the simulation faster, we decided to split the space into a grid of cells. Each cell keeps track of what particles and string bits are inside, way less collisions to check now!
+            </p>
+
+
+
+
             <figure class="center bordered">
-                <iframe width="80%" height="400" src="https://www.youtube.com/embed/placeholder"
-                    title="Placeholder video" frameborder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowfullscreen></iframe>
+                <video width="80%" height="400" controls>
+                    <source src="public/particle-string-interaction.mov" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
             </figure>
 
             <p>
-                [Placeholder note regarding background music or additional media info.]
+                After adding this grid-based collision, we've succeeded—kinda—in getting our string simulation working with the fluid particles together. Now we can show how the string vibrates and how waves form and flow through the particles.
+            </p> 
+
+            <p>
+                Our simulation has changed a lot from the beginning. We started with basic fluid simulation, and now we have this whole system loosely simulating how a string vibrates and how the air particles around it move.
             </p>
 
             <p>
-                [Placeholder final comments and an overall conclusion of the series.]
+                In the future we would love to be able to come back to this simulation, using more compute to be able to simulate a greater amount of particles. Where you really could visualize the wave behavior even better.
+
+            <p>
+                We've learned a lot during this project and we hope that you reading this, got some interesting insight into mass-spring systems and particle simulation or perhaps some new ideas for your own simulations.
             </p>
 
             <p>
-                [Placeholder acknowledgements and advice.]
+                Thanks for checking out our project!
             </p>
 
             <p>
-                [Placeholder references:]
-            </p>
-
-            <ul>
-                <li>[Placeholder Reference 1]</li>
-                <li>[Placeholder Reference 2]</li>
-                <li>[Placeholder Reference 3]</li>
-            </ul>
-
-            <p>
-                [Placeholder final farewell message.]
+                /David and Lovisa
             </p>
         </article>
     </main>
