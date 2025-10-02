@@ -1,3 +1,2 @@
-# DD1354_Project
-
-https://davidfornander.github.io/DD1354_Project/
+# Github Pages
+https://davidfornander.github.io/dd1354-project/
